@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARIA · Nurse Dashboard</title><meta name="description" content="ARIA nurse dashboard prototype with 12 patient profiles, CCTV playback demo alerts, and corridor response guidance.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231859e8'/%3E%3Cpath d='M5 17h6l3-8 5 15 3-7h5' fill='none' stroke='white' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css"><script src="app.js" defer></script>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="./" aria-label="ARIA Nurse Dashboard"><img class="aria-logo" src="aria-logo.png" alt="ARIA — Track. Detect. Respond." width="213" height="93"><span class="brand-description">Nurse Dashboard</span></a><div class="header-right"><div class="header-datetime" aria-label="Current date and time in Malaysia"><time id="header-time"></time><span id="header-date"></span></div><div class="staff"><span class="avatar">NS</span><span><strong>Nurse station</strong><small>Emergency · Level 1</small></span></div></div></header>
+<main>
+<section class="page-heading"><h1 class="aria-motto"><span>TRACK EARLY</span><span>DETECT CHANGE</span><span>RESPOND FASTER</span></h1></section>
+
+<section class="summary" aria-label="Patient counts"><div class="summary-card total"><span class="summary-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="3"/><path d="M3 20v-3a6 6 0 0 1 12 0v3M17 4a3 3 0 0 1 0 6m3 10v-3a6 6 0 0 0-3-5"/></svg></span><div><span class="summary-label">Patients monitored</span><strong id="count-total">12</strong></div><span class="summary-note">Across 4 zones</span></div><div class="summary-card urgent"><span class="status-orb"></span><div><span class="summary-label">Urgent review</span><strong id="count-urgent">1</strong></div><span class="summary-note">Immediate attention</span></div><div class="summary-card watch"><span class="status-orb"></span><div><span class="summary-label">Watch</span><strong id="count-watch">2</strong></div><span class="summary-note">Changes detected</span></div><div class="summary-card stable"><span class="status-orb"></span><div><span class="summary-label">Stable</span><strong id="count-stable">5</strong></div><span class="summary-note">No active concerns</span></div></section>
+
+<section class="cctv-card">
+ <div class="panel-heading"><div><h2>Ward CCTV Monitoring</h2><p>Recorded CCTV · playback-synchronised ARIA demo</p></div><div class="connection-status"><i></i> CCTV CONNECTED <span>·</span> READY</div></div>
+ <div class="cctv-main">
+  <div class="cctv-video-frame"><video id="aria-cctv" controls preload="metadata" playsinline><source src="hospital_cctv.mp4" type="video/mp4">Your browser cannot play this video.</video></div>
+  <aside class="p003-preview" id="p003-preview" hidden><div class="preview-head"><div><h3>Patient detected</h3><p>P003 · Wei Ming Tan</p></div><span id="p003-mini-status" class="status-badge badge-stable">Stable</span></div>
+   <img id="p003-watch-image" src="p003-watch.png" alt="P003 during the Watch stage">
+   <img id="p003-urgent-image" src="p003-fall-down.png" alt="P003 after the fall during Urgent Review" hidden>
+   <div class="preview-observation"><small>CURRENT OBSERVATION</small><strong id="p003-observation">Waiting for video playback</strong><p id="p003-message">Play the CCTV video to begin the configured demonstration.</p></div>
+   <div class="preview-vitals"><div><small>Heart rate</small><b id="p003-heart">— bpm</b></div><div><small>Respiratory rate</small><b id="p003-resp">16 /min</b></div><div><small>Temperature</small><b id="p003-temp">35.8 °C</b></div><div><small>Confidence</small><b id="p003-confidence">98%</b></div></div>
+   <button id="p003-open-details" class="primary-button" type="button">View patient profile & route</button>
+  </aside>
+ </div>
+ <div class="cctv-bottom"><span><b id="cctv-clock">00:00 / --:--</b> <span id="cctv-play-state">Paused · ready</span></span><span class="timeline-key"><i class="key-watch"></i>00:04 Watch</span><span class="timeline-key"><i class="key-urgent"></i>00:06 Urgent Review</span></div>
+ 
+</section>
+
+<div class="workspace"><section class="patients-panel"><div class="panel-heading"><div><h2>Patient List <span class="count-pill" id="patient-count-pill">12</span></h2><p>CCTV-linked observations · updated during video playback</p></div><span class="updated" id="updated">Updated just now</span></div><div class="patient-list" id="patients"></div><div class="legend"><span><i class="legend-dot urgent-bg"></i>Urgent review</span><span><i class="legend-dot watch-bg"></i>Watch</span><span><i class="legend-dot stable-bg"></i>Stable</span><span class="legend-hint">Select a patient for details & location</span></div></section>
+<aside class="right-column"><section class="alerts-panel"><div class="panel-heading"><h2><svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Alerts <span id="alert-count" class="count-pill red">1</span></h2><span class="tiny-label">LATEST FIRST</span></div><div id="alerts" aria-live="polite" aria-relevant="additions text"></div></section>
+<section class="demo-panel"><div class="demo-label"><span class="play-icon">▶</span> WORKFLOW DEMO</div><h2>See ARIA in action.</h2><p>Trigger a change for John Doe, then follow the alert to his seat.</p><label for="scenario">Simulated change</label><select id="scenario"><option value="posture">Slumping & reduced movement</option><option value="respiration">Respiration pattern change</option><option value="temperature">Rising surface temperature</option></select><button class="primary-button demo-button" id="run-demo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 10 7-10 7Z"/></svg>Run alert demo</button><button class="text-button" id="reset">Reset demo</button><p class="demo-status" id="demo-status" role="status">Ready when you are.</p></section></aside></div>
+<footer><span>ARIA <b>Adaptive Real-Time Intelligence Assessment</b></span></footer>
+</main>
+<dialog id="patient-dialog" aria-labelledby="dialog-title"><div class="dialog-top"><div><div class="eyebrow">PATIENT DETAILS & LOCATION</div><h2 id="dialog-title"></h2><p id="dialog-subtitle"></p></div><button class="close-button" id="close-dialog" aria-label="Close patient details">×</button></div><div class="dialog-content"><div class="detail-column" id="details"></div><div class="map-column"><div class="map-heading"><div><h3>Shortest route to patient</h3></div><span class="map-tag" id="patient-level">LEVEL 1</span></div><div class="route-transfer" id="route-transfer" hidden><span>Between floors</span><div class="transfer-options" role="group" aria-label="Route between floors"><button id="transfer-lift" data-transfer="lift" aria-pressed="true">Lift E1</button><button id="transfer-stairs" data-transfer="stairs" aria-pressed="false">Stairwell S1</button></div></div><div class="floor-map" id="floor-map"></div><div class="map-legend"><span><i class="route-key"></i>Guided route</span><span><i class="patient-key"></i>Patient location</span><span><i class="seat-key"></i>Other seats</span></div><div class="route-summary" id="route-summary"></div><h3 class="directions-heading">Go to the patient</h3><ol class="directions" id="directions"></ol></div></div><div class="dialog-bottom"><span id="response-status" role="status"></span><div id="response-actions"></div></div></dialog>
+<div id="toast" class="toast" role="status"></div>
+</body></html>
