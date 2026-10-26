@@ -132,8 +132,8 @@ function updateP003(stage){
   el('p003-message').textContent='Patient status is stable during this part of the video.';
  }else{
   const values=stage==='watch'
-   ?{status:'watch',heart:92,resp:22,temp:36.7,posture:'Movement change',movement:'Watch event',reason:'Unusual movement detected',factors:'Watch status for P003 at video time 00:04–00:05. Review the patient and continue observing.'}
-   :{status:'urgent',heart:108,resp:28,temp:36.9,posture:'Possible fall',movement:'Urgent review',reason:'Possible fall detected',factors:'Urgent Review status for P003 at video time 00:06 onward. Attend to P003 and verify the condition.'};
+   ?{status:'watch',heart:92,resp:22,temp:36.7,posture:'Movement change',movement:'Watch event',reason:'Unusual movement detected',factors:'Watch status for P003. Review the patient and continue observing.'}
+   :{status:'urgent',heart:108,resp:28,temp:36.9,posture:'Possible fall',movement:'Urgent review',reason:'Possible fall detected',factors:'Urgent Review status for P003. Attend to P003 and verify the condition.'};
   Object.assign(p,values);
   el('p003-mini-status').className='status-badge '+(stage==='watch'?'badge-watch':'badge-urgent');
   el('p003-watch-image').hidden=stage!=='watch';
@@ -141,7 +141,7 @@ function updateP003(stage){
   el('p003-mini-status').textContent=stage==='watch'?'Watch':'Urgent Review';
   el('p003-observation').textContent=stage==='watch'?'Unusual movement detected':'Possible patient fall detected';
   el('p003-message').textContent=stage==='watch'?'Watch alert active. Continue observing P003.':'Urgent Review active. Attend to P003 and verify the condition.';
-  const reason=stage==='watch'?'Unusual movement detected at video time 00:04.':'Possible fall detected at video time 00:06. Urgent Review required.';
+  const reason=stage==='watch'?'Unusual movement detected.':'Possible fall detected. Urgent Review required.';
   videoAlertId='video-p003-'+stage;
   alerts.unshift({id:videoAlertId,patientId:'P003',reason,created:Date.now(),stage:'new',videoEvent:true,videoStage:stage});
  }
