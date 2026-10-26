@@ -23,12 +23,24 @@ function ageText(date){const sec=Math.floor((Date.now()-date)/1000);return sec<6
 function badge(p){return `<span class="status-badge badge-${p.status}">${labels[p.status]}</span>`;}
 function renderPatients(){
 const countPill=document.getElementById('patient-count-pill');if(countPill)countPill.textContent=patients.length;
-$('patients').innerHTML=patients.map(p=>`<button class="patient-card ${p.status}" data-patient="${p.id}" aria-label="View ${p.name}, ${labels[p.status]}, Level ${p.level}, Zone ${p.zone}, Seat ${p.seat}"><span class="person"><span class="patient-avatar">${p.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</span><span><span class="patient-name">${p.name}</span><span class="patient-meta">${p.id} · ${p.age} yrs · ${p.sex}</span></span></span><span><span class="metric-label">Respiration</span><span class="metric-value">${p.resp} <small>/min</small></span><span class="metric-sub ${p.status==='urgent'?'changed':''}">${p.status==='urgent'?'Trend changed':'Radar estimate'}</span></span><span><span class="metric-label">Surface temp.</span><span class="metric-value">${p.temp.toFixed(1)}<small> °C</small></span><span class="metric-sub">Thermal estimate</span></span><span><span class="metric-label">Posture / activity</span><span class="posture">${p.posture}</span><span class="metric-sub ${p.posture==='Slumping'?'changed':''}">${p.movement}</span></span><span class="card-status">${badge(p)}<span class="location-label">${pin}L${p.level} · Zone ${p.zone} · Seat ${p.seat}</span></span></button>`).join('');
+$('patients').innerHTML=[...patients].sort((a, b) => {
+  const priority = { urgent: 2, watch: 1, stable: 0 };
+  return priority[b.status] - priority[a.status];
+}).map(p =>`<button class="patient-card ${p.status}" data-patient="${p.id}" aria-label="View ${p.name}, ${labels[p.status]}, Level ${p.level}, Zone ${p.zone}, Seat ${p.seat}"><span class="person"><span class="patient-avatar">${p.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</span><span><span class="patient-name">${p.name}</span><span class="patient-meta">${p.id} · ${p.age} yrs · ${p.sex}</span></span></span><span><span class="metric-label">Respiration</span><span class="metric-value">${p.resp} <small>/min</small></span><span class="metric-sub ${p.status==='urgent'?'changed':''}">${p.status==='urgent'?'Trend changed':'Radar estimate'}</span></span><span><span class="metric-label">Surface temp.</span><span class="metric-value">${p.temp.toFixed(1)}<small> °C</small></span><span class="metric-sub">Thermal estimate</span></span><span><span class="metric-label">Posture / activity</span><span class="posture">${p.posture}</span><span class="metric-sub ${p.posture==='Slumping'?'changed':''}">${p.movement}</span></span><span class="card-status">${badge(p)}<span class="location-label">${pin}L${p.level} · Zone ${p.zone} · Seat ${p.seat}</span></span></button>`).join('');
 ['stable','watch','urgent'].forEach(s=>$('count-'+s).textContent=patients.filter(p=>p.status===s).length);
 }
 function renderAlerts(){
-const active=alerts.filter(a=>a.stage!=='completed');$('alert-count').textContent=active.length;
-$('alerts').innerHTML=alerts.length?alerts.map(a=>{const p=getPatient(a.patientId);return `<article class="alert-card ${a.stage==='completed'?'resolved':''}"><div class="alert-top"><span class="alert-level">${a.stage==='completed'?'REASSESSMENT COMPLETE':a.videoStage==='watch'?'WATCH':a.videoStage==='urgent'?'URGENT REVIEW':'URGENT REVIEW'}</span><span class="alert-time">${ageText(a.created)}</span></div><h3>${p.name}</h3><p>${a.reason}</p><div class="alert-location">Zone ${p.zone} · Seat ${p.seat} <span> / </span> Level ${p.level}</div><button class="alert-open" data-alert="${a.id}">${a.stage==='completed'?'View patient & location':'View alert & location'}</button>${a.stage!=='new'?`<div class="alert-state">${stageLabel(a.stage)}</div>`:''}</article>`}).join(''):'<div class="empty-alerts">No active alerts.<br>All patients are in view.</div>';
+ const priority = { urgent: 2, watch: 1, stable: 0 };
+ const active = alerts.filter(a => a.stage !== 'completed');
+ active.sort((a,b) => {
+  const ap = priority[getPatient(a.patientId).status] || 0;
+  const bp = priority[getPatient(b.patientId).status] || 0;
+  return bp-ap || b.created-a.created;
+ });
+ const completed = alerts.filter(a=>a.stage==='completed').sort((a,b)=>b.created-a.created);
+ const ordered=[...active,...completed];
+ $('alert-count').textContent=active.length;
+ $('alerts').innerHTML=ordered.length ? ordered.map(a=>{const p=getPatient(a.patientId);return `<article class="alert-card ${a.stage==='completed'?'resolved':''}"><div class="alert-top"><span class="alert-level">${a.stage==='completed'?'REASSESSMENT COMPLETE':a.videoStage==='watch'?'WATCH':a.videoStage==='urgent'?'URGENT REVIEW':'URGENT REVIEW'}</span><span class="alert-time">${ageText(a.created)}</span></div><h3>${p.name}</h3><p>${a.reason}</p><div class="alert-location">Zone ${p.zone} · Seat ${p.seat} <span> / </span> Level ${p.level}</div><button class="alert-open" data-alert="${a.id}">${a.stage==='completed'?'View patient & location':'View alert & location'}</button>${a.stage!=='new'?`<div class="alert-state">${stageLabel(a.stage)}</div>`:''}</article>`}).join(''):'<div class="empty-alerts">No active alerts.<br>All patients are in view.</div>';
 }
 function stageLabel(s){return {new:'Awaiting nurse acknowledgement',acknowledged:'Alert acknowledged · reassessment pending',completed:'Reassessment completed'}[s];}
 function notify(message){$('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),4500);}
@@ -149,7 +161,12 @@ function updateP003(stage){
  el('p003-resp').textContent=p.resp+' /min';
  el('p003-temp').textContent=p.temp.toFixed(1)+' °C';
  // Keep patient card, alert card, profile dialog and summary counters consistent.
- renderPatients();renderAlerts();
+ renderPatients();
+ renderAlerts();
+ if (stage !== 'stable') {
+   const alertList = document.getElementById('alerts');
+   if (alertList) alertList.scrollTop = 0;
+ }
  if(selected==='P003'&&el('patient-dialog').open)renderDialog();
  const preview=el('p003-preview');
  preview.hidden=(stage==='stable');
