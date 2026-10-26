@@ -171,11 +171,32 @@ function resetVideoDemo(){
  el('cctv-play-state').textContent='Paused · ready';sync();
 }
 video.addEventListener('timeupdate',sync);video.addEventListener('seeked',()=>{delete video.dataset.demoScenario;sync();});video.addEventListener('play',()=>{delete video.dataset.demoScenario;sync();});video.addEventListener('pause',sync);video.addEventListener('ended',sync);
-el('cctv-restart').addEventListener('click',()=>{resetVideoDemo();video.play().catch(()=>{});});
+const restartVideoButton = document.getElementById('cctv-restart');
+if (restartVideoButton) {
+  restartVideoButton.addEventListener('click', () => {
+    resetVideoDemo();
+    video.play().catch(() => {});
+  });
+}
 const originalResetButton=document.getElementById('reset');if(originalResetButton)originalResetButton.addEventListener('click',()=>{resetVideoDemo();});
-el('p003-open-details').addEventListener('click',()=>{
- const p=getPatient('P003');
- if(p.status!=='stable')openPatient('P003');
-});
+const viewP003Button = document.getElementById('p003-open-details');
+if (viewP003Button) {
+  viewP003Button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      openPatient('P003');
+
+      const patientDialog = document.getElementById('patient-dialog');
+
+      if (patientDialog && !patientDialog.open) {
+        patientDialog.showModal();
+      }
+    } catch (error) {
+      console.error('Could not open P003 patient profile:', error);
+    }
+  });
+}
 updateP003('stable');sync();
 })();
