@@ -107,63 +107,31 @@ demonstrates:
 
 ARIA is planned as a six-layer system:
 
-  -----------------------------------------------------------------------
-  Layer                               Intended role
-  ----------------------------------- -----------------------------------
-  Physical layer                      Patient identification and zone
-                                      tracking through wristbands and
-                                      BLE.
-
-  Sensing layer                       Contactless monitoring using RGB
-                                      cameras, thermal sensing and mmWave
-                                      radar.
-
-  Edge AI layer                       Edge intelligence and patient
-                                      association using the proposed
-                                      Huawei Atlas platform.
-
-  Cognitive layer                     Multi-sensor fusion, risk
-                                      assessment and alert generation.
-
-  Cloud layer                         Centralised records, alert history,
-                                      device connectivity and supporting
-                                      services.
-
-  Application layer                   Nurse dashboard and clinical
-                                      response workflow.
-  -----------------------------------------------------------------------
+| Layer | Intended role |
+|---|---|
+| Physical layer | Patient identification and zone tracking through wristbands and BLE. |
+| Sensing layer | Contactless monitoring using RGB cameras, thermal sensing and mmWave radar. |
+| Edge AI layer | Edge intelligence and patient association using the proposed Huawei Atlas platform. |
+| Cognitive layer | Multi-sensor fusion, risk assessment and alert generation. |
+| Cloud layer | Centralised records, alert history, device connectivity and supporting services. |
+| Application layer | Nurse dashboard and clinical response workflow. |
 
 ## Proposed Huawei Technology Integration
 
-The presentation explores the following Huawei technologies as possible
-parts of the wider ARIA architecture:
+The presentation explores the following Huawei technologies as possible parts of the wider ARIA architecture:
 
-  -----------------------------------------------------------------------
-  Technology                          Proposed role
-  ----------------------------------- -----------------------------------
-  Huawei Atlas 200                    Edge AI processing.
+| Technology | Proposed role |
+|---|---|
+| Huawei Atlas 200 | Edge AI processing. |
+| MindSpore | AI model development and inference. |
+| CANN | AI inference acceleration. |
+| Huawei IoTDA | Device connectivity and management. |
+| Huawei ModelArts | Model training and deployment workflows. |
+| Huawei GaussDB | Monitoring records, alerts and historical trends. |
+| Huawei FunctionGraph | Event processing, alert routing and workflow automation. |
+| Huawei Cloud OBS | Storage for suitable application assets and data. |
 
-  MindSpore                           AI model development and inference.
-
-  CANN                                AI inference acceleration.
-
-  Huawei IoTDA                        Device connectivity and management.
-
-  Huawei ModelArts                    Model training and deployment
-                                      workflows.
-
-  Huawei GaussDB                      Monitoring records, alerts and
-                                      historical trends.
-
-  Huawei FunctionGraph                Event processing, alert routing and
-                                      workflow automation.
-
-  Huawei Cloud OBS                    Storage for suitable application
-                                      assets and data.
-  -----------------------------------------------------------------------
-
-These are proposed integrations; the current dashboard has not yet been
-connected to all these services.
+These are proposed integrations; the current dashboard has not yet been connected to all these services.
 
 ## Current Prototype and Limitations
 
