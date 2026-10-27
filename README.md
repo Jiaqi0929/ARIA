@@ -1,4 +1,4 @@
-# ARIA --- Adaptive Real-Time Intelligence Assessment for Emergency Care
+# ARIA - Adaptive Real-Time Intelligence Assessment for Emergency Care
 
 **An intelligent patient-monitoring system concept designed to help
 healthcare staff identify changes in patient condition and prioritise
@@ -81,10 +81,10 @@ Risk-assessment logic would then classify cases for review.
 
 The intended dashboard categories are:
 
--   **Stable** --- no current concern identified by the system.
--   **Watch** --- a change has been identified and should be monitored
+-   **Stable** - no current concern identified by the system.
+-   **Watch** - a change has been identified and should be monitored
     or reviewed.
--   **Urgent Review** --- a potentially serious event requires prompt
+-   **Urgent Review** - a potentially serious event requires prompt
     human assessment.
 
 These categories support prioritisation; they are not medical diagnoses.
@@ -218,7 +218,7 @@ and help staff prioritise attention more effectively.
 
 ## Team
 
-**Project:** ARIA --- Adaptive Real-Time Intelligence Assessment for
+**Project:** ARIA - Adaptive Real-Time Intelligence Assessment for
 Emergency Care\
 **Competition:** Huawei ICT Competition 2026--2027, Innovation
 Competition\
