@@ -4,7 +4,7 @@
 healthcare staff identify changes in patient condition and prioritise
 attention.**
 
-ARIA is our project for the **Huawei ICT Competition 2026--2027
+ARIA is our project for the **Huawei ICT Competition 2026-2027
 Innovation Competition**, presented by **Multimedia University (MMU) +
 Brain 404**. We are exploring how patient identification, contactless
 sensing, computer vision and intelligent risk assessment could work
