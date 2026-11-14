@@ -1,87 +1,57 @@
-# ARIA Nurse Dashboard — Local Source Code
+# ARIA nurse dashboard: offline copy with demo add-ons
 
-This package contains the current published dashboard (version 4), with its logo,
-patient list, simulated observations, alert demo, three-floor maps, lift/stair routes,
-and acknowledgement/reassessment actions.
+A copy of the live prototype (aria-wn0k.onrender.com) that runs without internet and adds two things to the demo:
 
-## Run on Windows — no installation required
+1. **Early-warning replay.** At 0:04, Mr Tan (P003) goes to Watch because his breathing left the normal range. A chart replays his last 30 minutes (17 → 28 breaths/min) through NEWS2 zones, with the steps Watch (T−25) → Reminder (T−10) → Urgent (T−0).
+2. **Three witnesses.** At 0:06, the camera, radar, thermal and wristband + face rows tick in one by one, then **URGENT REVIEW**. "View patient profile & route" only appears after the decision.
 
-1. Right-click ARIA_Nurse_Dashboard_Source.zip and choose Extract All.
-2. Open the extracted ARIA_Nurse_Dashboard folder.
-3. Double-click index.html to open the dashboard in your browser.
-   You can also double-click START_ARIA.bat.
-4. Select Run alert demo, then View alert & location. Use Acknowledge Alert and
-   Reassessment completed to demonstrate the response workflow.
+3. **Fuller CCTV box on wide screens (1400 px and up, e.g. a full-screen projector).**
+   - Left rail **Sensors**: camera, radar, thermal, wristbands and Atlas edge AI, each with a pulsing "online" dot.
+   - Right rail **The monitoring gap**: time since each patient's last nurse check (Mr Tan longest at 1 h 58 min), plus "ARIA: watching all 12 continuously". It hands over to Mr Tan's preview when the alert fires.
+   - Video overlay: "● ARIA analysing" and "12 tracked · 3 sensors fused · 0 alerts", which turns amber at Watch and red at Urgent.
+   - On laptop-width screens the rails hide, and the overlay stays.
 
-Keep index.html, styles.css, app.js, and aria-logo.png together in this folder.
-Extract the ZIP before opening the website; do not run it inside the ZIP viewer.
+Also new in the Workflow demo dropdown: **"False-alarm check: resting patient (P001)"**. Mr Rahman lies across the seats with steady breathing, and ARIA raises **no alert**.
 
-No npm install, Node.js, database, API key, login, or backend is needed.
-The dashboard works offline using fallback fonts. An internet connection loads
-its original Google Fonts and gives the closest match to the hosted appearance.
+All values are a simulated demo scenario.
 
-## Optional: run through localhost
+## How to run it at the venue (no internet)
 
-If Python is already installed, open PowerShell in this folder and run:
+1. Copy this whole folder to the presenting laptop.
+2. Double-click `index.html`. It opens in Chrome or Edge. Video seeking and everything else works from the file directly.
+3. Press play on the CCTV video. Pause at 0:06 if you want time to talk through the witnesses.
 
-    py -m http.server 8000 --bind 127.0.0.1
+Fonts fall back to Arial offline, which is fine.
 
-Then open http://127.0.0.1:8000/index.html in your browser.
-If your Python command is python instead of py, use python in the command above.
-Press Ctrl+C in PowerShell to stop the server.
+## Demo click order (about 2 minutes)
 
-## Files and editing
+0. Before pressing play (full screen): point left, *"three sensors and the wristbands, all online, fused on the Atlas in the room"*, then right, *"Mr Tan was last checked almost two hours ago. That's the monitoring gap. ARIA watches all 12 in between."*
+1. Play the CCTV. At **0:04**: point at the Watch banner and the rising breathing line. *"ARIA saw it coming, 25 minutes before the fall."*
+2. At **0:06** (pause): the witness rows tick in. *"Camera, radar and thermal all agree, and the wristband confirms it's Mr Tan. That's when ARIA alerts."*
+3. Click **View patient profile & route**, then **Acknowledge Alert**, then **Reassessment completed**.
+4. Optional: **Reset demo**, choose **False-alarm check**, click **Run alert demo**. *"A camera alone would alarm here too. ARIA doesn't, because his breathing is normal."*
 
-- index.html — page structure, headings, and popup layout.
-- styles.css — blue theme, typography, colours, and responsive layout.
-- app.js — sample patients, simulated readings and alerts, floor maps,
-  shortest-route calculation, and response actions.
-- aria-logo.png — your ARIA logo.
-- START_ARIA.bat — opens index.html with the default Windows browser.
+## What changed in the code
 
-Open the folder in your code editor, edit the files, save, and refresh the browser.
-Local changes do not update the hosted website automatically.
+New files:
+- `aria-addons.js`: the add-ons (data, chart, witness panel). Exposes `window.ariaAddons`.
+- `aria-addons.css`: styles, all prefixed `aa-` so they don't clash with `styles.css`.
 
-## Current implementation
+`index.html`:
+- loads `aria-addons.css` and `aria-addons.js` (before `app.js`)
+- demo panel text: "John Doe" → "Mr Tan (P003)"
+- new dropdown option `false-alarm`
 
-This is a frontend demonstration. Readings, patient-match confidence, and events
-are simulated. The route graph uses an example layout with three floors and
-48 seats per floor. This package does not include CCTV/video processing, a trained
-AI model, live BLE tracking, real patient data, or a Huawei Cloud backend.
-Refreshing the page resets the demonstration state. These integrations can be
-added separately when developing the full ARIA system.
+`app.js` (each change marked with an `ARIA add-on` comment):
+- `updateP003()`: Watch reason is now "Breathing above normal range (22/min)" instead of "Unusual movement detected"; calls `ariaAddons.onStage(stage)` at the end.
+- `sync()`: calls `ariaAddons.onTime(t)` so the trend replays smoothly between 0:04 and 0:06.
+- `renderPatients()`: sparkline under Mr Tan's respiration value.
+- `renderDialog()`: breathing chart at the bottom of the details column.
+- `runDemo()`: accepts `false-alarm`.
 
-## Source reference
+The untouched originals are in `original/`. To update the live site, upload `index.html`, `app.js`, `aria-addons.js` and `aria-addons.css` to the onrender project.
 
-Hosted website: https://aria-nurse-dashboard.neilboo005.chatgpt.site
-Site version: 4
-Source commit: 221c1e99aed09d055da530700a8e165f017d972c
-Export date: 25 October 2026
+## Still for the team to decide
 
-The four website files are unchanged from the retrieved source. The README and
-Windows launcher were added only to make this local copy easier to use.
-
-
-## CCTV demo update
-- Original ARIA layout, patient detail dialog, alert workflow, and three-floor corridor routing are retained.
-- All 12 profiles P001–P012 are present. P001–P004 are set as male and P005–P012 as female for this prototype dataset.
-- `hospital_cctv.avi` is the exact uploaded file renamed as requested. `hospital_cctv.mp4` is a browser-friendly H.264 copy used by the player because many browsers do not play AVI directly.
-- `p003-fall-down.png` is the supplied P003 fall-down reference image. It appears beside the video and in P003's detail dialog.
-- On video playback, P003 changes to Watch at 00:04 and Urgent Review at 00:06. The same alert card updates from yellow to red, so Watch count returns to 0 and Urgent Review becomes 1.
-- Pausing holds the video time and current status; the final alert stays visible when playback ends. Use Restart video & reset alert to clear the event sequence.
-- All readings and confidence values are simulated demo values. The timed alerts are configured events, not AI-confirmed fall detections or clinical measurements.
-
-
-## Revision: patient status and data consistency
-- Gender assignments: P001, P002, P003, P004 and P011 are male; P005, P006, P007, P008, P009, P010 and P012 are female.
-- The P003 side panel stays hidden during Stable (video 00:00–00:03), appears during Watch (00:04–00:05), and appears during Urgent Review (00:06 through the end).
-- The video is centered and wider while P003 is Stable. When Watch/Urgent Review activates, the video moves to the left and P003 details appear on the right.
-- Heart rate, respiration, temperature, posture, movement and status are read from the same P003 patient object for the patient card, side panel and detail dialog.
-- Run alert demo now targets P003 and updates the shared P003 data according to the selected scenario. Values are prototype demonstration readings, not clinical sensor readings.
-- Seeking to another time follows that time interval. Pausing holds the current interval; the last alert remains after the video ends.
-
-
-## Distinct P003 alert images
-- `p003-watch.png` uses the supplied Watch-stage image and is shown only during Watch (00:04–00:05).
-- `p003-fall-down.png` uses the supplied fall-down image and is shown only during Urgent Review (00:06 to the end).
-- Both images are hidden while P003 is Stable.
+- **Heart rate** (92 → 108 bpm) is still shown, as before. Decide its source (e.g. "radar estimate") or remove it, so it doesn't contradict "the wristband doesn't measure heartbeat".
+- **Patient in the scenario videos** looks younger than Mr Tan (72). Either change his age in `app.js` (`initialPatients`, P003) or leave it.

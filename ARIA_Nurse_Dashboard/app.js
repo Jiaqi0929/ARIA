@@ -26,7 +26,7 @@ const countPill=document.getElementById('patient-count-pill');if(countPill)count
 $('patients').innerHTML=[...patients].sort((a, b) => {
   const priority = { urgent: 2, watch: 1, stable: 0 };
   return priority[b.status] - priority[a.status];
-}).map(p =>`<button class="patient-card ${p.status}" data-patient="${p.id}" aria-label="View ${p.name}, ${labels[p.status]}, Level ${p.level}, Zone ${p.zone}, Seat ${p.seat}"><span class="person"><span class="patient-avatar">${p.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</span><span><span class="patient-name">${p.name}</span><span class="patient-meta">${p.id} · ${p.age} yrs · ${p.sex}</span></span></span><span><span class="metric-label">Respiration</span><span class="metric-value">${p.resp} <small>/min</small></span><span class="metric-sub ${p.status==='urgent'?'changed':''}">${p.status==='urgent'?'Trend changed':'Radar estimate'}</span></span><span><span class="metric-label">Surface temp.</span><span class="metric-value">${p.temp.toFixed(1)}<small> °C</small></span><span class="metric-sub">Thermal estimate</span></span><span><span class="metric-label">Posture / activity</span><span class="posture">${p.posture}</span><span class="metric-sub ${p.posture==='Slumping'?'changed':''}">${p.movement}</span></span><span class="card-status">${badge(p)}<span class="location-label">${pin}L${p.level} · Zone ${p.zone} · Seat ${p.seat}</span></span></button>`).join('');
+}).map(p =>`<button class="patient-card ${p.status}" data-patient="${p.id}" aria-label="View ${p.name}, ${labels[p.status]}, Level ${p.level}, Zone ${p.zone}, Seat ${p.seat}"><span class="person"><span class="patient-avatar">${p.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</span><span><span class="patient-name">${p.name}</span><span class="patient-meta">${p.id} · ${p.age} yrs · ${p.sex}</span></span></span><span><span class="metric-label">Respiration</span><span class="metric-value">${p.resp} <small>/min</small></span><span class="metric-sub ${p.status==='urgent'?'changed':''}">${p.status==='urgent'?'Trend changed':'Radar estimate'}</span>${window.ariaAddons?.cardSpark?.(p)||''}</span><span><span class="metric-label">Surface temp.</span><span class="metric-value">${p.temp.toFixed(1)}<small> °C</small></span><span class="metric-sub">Thermal estimate</span></span><span><span class="metric-label">Posture / activity</span><span class="posture">${p.posture}</span><span class="metric-sub ${p.posture==='Slumping'?'changed':''}">${p.movement}</span></span><span class="card-status">${badge(p)}<span class="location-label">${pin}L${p.level} · Zone ${p.zone} · Seat ${p.seat}</span></span></button>`).join('');
 ['stable','watch','urgent'].forEach(s=>$('count-'+s).textContent=patients.filter(p=>p.status===s).length);
 }
 function renderAlerts(){
@@ -70,7 +70,7 @@ function routeDirections(p,r){const transfer=r.mode==='lift'?'Lift E1':'Stairwel
 
 function activeAlert(p){return alerts.find(a=>a.patientId===p.id&&a.stage!=='completed');}
 function renderDialog(){const p=getPatient(selected),a=activeAlert(p),r=shortestRoute(p.seat,p.level);$('dialog-title').textContent=p.name;$('dialog-subtitle').textContent=`${p.id} · ${p.age} years · ${p.sex==='F'?'Female':'Male'} · Level ${p.level}, Zone ${p.zone}, Seat ${p.seat}`;
-$('details').innerHTML=`${p.id==='P003'&&p.status==='watch'?'<div class="p003-dialog-photo"><img src="p003-watch.png" alt="P003 Watch reference image"><span>Watch reference</span></div>':p.id==='P003'&&p.status==='urgent'?'<div class="p003-dialog-photo"><img src="p003-fall-down.png" alt="P003 Urgent Review reference image"><span>Fall-down reference</span></div>':''}<div class="detail-status">${badge(p)}</div>${p.status!=='stable'?`<div class="detail-alert ${p.status==='watch'?'watch-detail':''}"><h3>${p.reason}</h3><p>${p.factors}</p></div>`:'<div class="detail-alert watch-detail"><h3>No active concerns</h3></div>'}<div class="detail-metrics"><div class="detail-metric"><span>Heart rate</span><strong>${p.heart} bpm</strong></div><div class="detail-metric"><span>Respiration</span><strong>${p.resp} /min</strong></div><div class="detail-metric"><span>Surface temp.</span><strong>${p.temp.toFixed(1)} °C</strong></div><div class="detail-metric"><span>Posture</span><strong>${p.posture}</strong></div><div class="detail-metric"><span>Movement</span><strong>${p.movement}</strong></div></div><div class="confidence">Patient match<strong>${p.confidence}%</strong><div class="confidence-track"><span style="width:${p.confidence}%"></span></div></div>`;
+$('details').innerHTML=`${p.id==='P003'&&p.status==='watch'?'<div class="p003-dialog-photo"><img src="p003-watch.png" alt="P003 Watch reference image"><span>Watch reference</span></div>':p.id==='P003'&&p.status==='urgent'?'<div class="p003-dialog-photo"><img src="p003-fall-down.png" alt="P003 Urgent Review reference image"><span>Fall-down reference</span></div>':''}<div class="detail-status">${badge(p)}</div>${p.status!=='stable'?`<div class="detail-alert ${p.status==='watch'?'watch-detail':''}"><h3>${p.reason}</h3><p>${p.factors}</p></div>`:'<div class="detail-alert watch-detail"><h3>No active concerns</h3></div>'}<div class="detail-metrics"><div class="detail-metric"><span>Heart rate</span><strong>${p.heart} bpm</strong></div><div class="detail-metric"><span>Respiration</span><strong>${p.resp} /min</strong></div><div class="detail-metric"><span>Surface temp.</span><strong>${p.temp.toFixed(1)} °C</strong></div><div class="detail-metric"><span>Posture</span><strong>${p.posture}</strong></div><div class="detail-metric"><span>Movement</span><strong>${p.movement}</strong></div></div><div class="confidence">Patient match<strong>${p.confidence}%</strong><div class="confidence-track"><span style="width:${p.confidence}%"></span></div></div>${window.ariaAddons?.dialogTrend?.(p)||''}`;
 $('patient-level').textContent=`LEVEL ${p.level}`;$('floor-map').innerHTML=buildMap(p,r);
 $('route-transfer').hidden=!r.transfer;$('transfer-lift').setAttribute('aria-pressed',String(selectedTransfer==='lift'));$('transfer-stairs').setAttribute('aria-pressed',String(selectedTransfer==='stairs'));
 $('route-summary').innerHTML=`<strong>Level ${p.level} · Zone ${p.zone} · Seat ${p.seat}</strong><span>Approx. ${r.meters} m walking${r.transfer?' · '+(r.mode==='lift'?'Lift E1':'Stairwell S1'):''}</span>`;
@@ -82,9 +82,16 @@ $('response-actions').innerHTML=a?`<button class="primary-button" id="advance-re
 function openPatient(id){getPatient(id);selected=id;selectedTransfer='lift';renderDialog();if(!$('patient-dialog').open)$('patient-dialog').showModal();const p=getPatient(id);return {patientId:id,level:p.level,zone:p.zone,seat:p.seat,routeMeters:shortestRoute(p.seat,p.level).meters};}
 function advanceResponse(next){if(!selected)throw new Error('Open an active alert first');const p=getPatient(selected),a=activeAlert(p);if(!a)throw new Error('No active alert for this patient');const valid={new:'acknowledged',acknowledged:'completed'};if(valid[a.stage]!==next)throw new Error('Response steps must be completed in order');a.stage=next;if(next==='completed'){p.status='stable';p.posture='Seated';p.movement='Usual movement';p.resp=18;p.temp=36.1;p.reason=undefined;p.factors=undefined;notify(`Reassessment completed for ${p.name}. Demo observations returned to baseline.`);if(p.id==='P002'){$('demo-status').textContent='Workflow complete. Reset to present it again.';demoRunning=false;$('run-demo').disabled=true;$('scenario').disabled=false;}}renderPatients();renderAlerts();renderDialog();return {patientId:p.id,stage:a.stage,status:labels[p.status]};}
 function runDemo(scenario=$('scenario').value){
-if(!['posture','respiration','temperature'].includes(scenario))throw new Error('Unknown simulated change');
+if(!['posture','respiration','temperature','false-alarm'].includes(scenario))throw new Error('Unknown simulated change');
 if(demoRunning)throw new Error('Reset the demo before running it again');
 demoRunning=true;$('scenario').value=scenario;$('run-demo').disabled=true;$('scenario').disabled=true;
+if(scenario==='false-alarm'){ // ARIA add-on: posture change alone, breathing steady -> logged, no alarm
+ Object.assign(getPatient('P001'),{posture:'Lying across seats',movement:'Low movement'});renderPatients();
+ window.ariaAddons?.falseAlarm();
+ $('demo-status').textContent='P001 lying across seats · breathing steady · no alert raised';
+ notify('Posture change only for P001. Logged and watched, no alarm.');
+ return {patientId:'P001',stage:'stable',scenario};
+}
 const p=getPatient('P003');
 $('demo-status').textContent='Updating P003 for the selected scenario…';
 const changes={
@@ -119,7 +126,7 @@ setInterval(()=>{patients.forEach(p=>{if(p.status!=='stable')return;const base=i
 // Optional browser tool interface uses the same demo state and actions as the visible controls.
 if(document.modelContext?.registerTool){const lifecycle=new AbortController();const tools=[
 {name:'get_patient_overview',title:'Read ARIA patient overview',description:'Read fictional patient statuses, locations, and response stages in this prototype.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:()=>({patients:patients.map(p=>({id:p.id,name:p.name,status:p.status,level:p.level,zone:p.zone,seat:p.seat})),alerts:alerts.map(a=>({patientId:a.patientId,stage:a.stage}))})},
-{name:'start_alert_demo',title:'Start simulated ARIA alert',description:'Start a simulated change for John Doe; an urgent alert appears after detection. This does not contact staff.',inputSchema:{type:'object',properties:{scenario:{type:'string',enum:['posture','respiration','temperature']}},required:['scenario'],additionalProperties:false},execute:input=>{if(!input||typeof input.scenario!=='string')throw new Error('scenario is required');return runDemo(input.scenario);}},
+{name:'start_alert_demo',title:'Start simulated ARIA alert',description:'Start a simulated change for Wei Ming Tan (P003), or a false-alarm check for a resting patient (P001). This does not contact staff.',inputSchema:{type:'object',properties:{scenario:{type:'string',enum:['posture','respiration','temperature','false-alarm']}},required:['scenario'],additionalProperties:false},execute:input=>{if(!input||typeof input.scenario!=='string')throw new Error('scenario is required');return runDemo(input.scenario);}},
 {name:'open_patient_location',title:'Open patient location',description:'Open a fictional patient’s details and shortest route from the demo nurse station.',inputSchema:{type:'object',properties:{patientId:{type:'string'}},required:['patientId'],additionalProperties:false},execute:input=>{if(!input||typeof input.patientId!=='string')throw new Error('patientId is required');return openPatient(input.patientId);}},
 {name:'advance_alert_response',title:'Advance simulated response',description:'Advance the selected alert through acknowledgement and completed reassessment in order. Completion resets simulated observations.',inputSchema:{type:'object',properties:{stage:{type:'string',enum:['acknowledged','completed']}},required:['stage'],additionalProperties:false},execute:input=>{if(!input||typeof input.stage!=='string')throw new Error('stage is required');return advanceResponse(input.stage);}}
 ];for(const tool of tools){try{Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});}
@@ -144,16 +151,16 @@ function updateP003(stage){
   el('p003-message').textContent='Patient status is stable during this part of the video.';
  }else{
   const values=stage==='watch'
-   ?{status:'watch',heart:92,resp:22,temp:36.7,posture:'Movement change',movement:'Watch event',reason:'Unusual movement detected',factors:'Watch status for P003. Review the patient and continue observing.'}
+   ?{status:'watch',heart:92,resp:22,temp:36.7,posture:'Seated',movement:'Moving less',reason:'Breathing above normal range (22/min)',factors:'Breathing has risen from 18 to 22/min (NEWS2 score 2). Check P003 within 30 minutes.'}
    :{status:'urgent',heart:108,resp:28,temp:36.9,posture:'Possible fall',movement:'Urgent review',reason:'Possible fall detected',factors:'Urgent Review status for P003. Attend to P003 and verify the condition.'};
   Object.assign(p,values);
   el('p003-mini-status').className='status-badge '+(stage==='watch'?'badge-watch':'badge-urgent');
   el('p003-watch-image').hidden=stage!=='watch';
   el('p003-urgent-image').hidden=stage!=='urgent';
   el('p003-mini-status').textContent=stage==='watch'?'Watch':'Urgent Review';
-  el('p003-observation').textContent=stage==='watch'?'Unusual movement detected':'Possible patient fall detected';
-  el('p003-message').textContent=stage==='watch'?'Watch alert active. Continue observing P003.':'Urgent Review active. Attend to P003 and verify the condition.';
-  const reason=stage==='watch'?'Unusual movement detected.':'Possible fall detected. Urgent Review required.';
+  el('p003-observation').textContent=stage==='watch'?'Breathing above normal range':'Possible patient fall detected';
+  el('p003-message').textContent=stage==='watch'?'Watch alert active. Breathing rising for 25 min. Check P003 within 30 min.':'Urgent Review active. Attend to P003 and verify the condition.';
+  const reason=stage==='watch'?'Breathing above normal range (22/min). Check within 30 min.':'Possible fall detected. Urgent Review required.';
   videoAlertId='video-p003-'+stage;
   alerts.unshift({id:videoAlertId,patientId:'P003',reason,created:Date.now(),stage:'new',videoEvent:true,videoStage:stage});
  }
@@ -172,6 +179,8 @@ function updateP003(stage){
  preview.hidden=(stage==='stable');
  document.querySelector('.cctv-card').classList.toggle('has-alert',stage!=='stable');
  activeVideoStage=stage;
+ window.ariaAddons?.onStage(stage); // ARIA add-on: early-warning replay + three witnesses
+ renderPatients(); // refresh P003's card sparkline after the add-on updates
 }
 function sync(){
  const t=video.currentTime||0,d=Number.isFinite(video.duration)?video.duration:0;
@@ -181,6 +190,7 @@ function sync(){
  if(video.paused && t===0 && video.dataset.demoScenario){return;}
  const stage=t<4?'stable':t<6?'watch':'urgent';
  if(stage!==activeVideoStage)updateP003(stage);
+ window.ariaAddons?.onTime(t); // ARIA add-on: smooth trend replay between 0:04 and 0:06
  if(video.ended)el('cctv-play-state').textContent='Ended · final alert retained';
 }
 function resetVideoDemo(){
